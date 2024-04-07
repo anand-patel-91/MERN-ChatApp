@@ -1,0 +1,326 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;700&display=swap');
+
+*{
+    font-family: 'Roboto Flex', sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+.formContainer {
+    background-color: rgb(168, 168, 255);
+    background-image: url("./img/doodle.png");
+    background-repeat:space;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.formWrapper{
+    background-color: #eee;
+    padding: 20px 60px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-logo{
+    color: rgb(98, 98, 249);
+    font-size: 24px;
+    font-family: 'Pacifico', cursive;
+}
+
+.form-title{
+    color: rgb(98, 98, 249);
+    font-size: 15px;
+}
+
+.formWrapper form{
+    background-color: #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.formWrapper input{
+    padding: 15px;
+    border: none;
+    border-bottom: 1px solid rgb(168, 168, 255);
+    width: 250px;
+    border-radius: 5px;
+}
+
+.formWrapper form button {
+    background-color: rgb(98, 98, 249);
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.formWrapper p{
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.file{
+    display: none;
+}
+
+.formWrapper form label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #997cda;
+}
+
+.formWrapper form label img{
+    width: 32px;
+    height: auto;
+}
+
+.home{
+    height: 100vh;
+}
+
+.home-container{
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+}
+
+.sidebar{
+    flex: 1;
+    background-color: rgb(69, 69, 117);
+}
+
+.chat{
+    flex: 2;
+}
+
+.navbar{
+    display: flex;
+    align-items: center;
+    background-color: rgb(48, 48, 81);
+    height: 50px;
+    padding: 10px;
+    justify-content: space-between;
+    color: white;
+}
+
+.nav-logo{
+    font-size: 24px;
+    font-family: 'Pacifico', cursive;
+}
+
+.nav-user{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.nav-user img{
+    background-color: #fff;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.nav-user button{
+    background-color: rgb(69, 69, 117);
+    color: white;
+    font-size: 10px;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.search{
+    padding: 5px;
+    border-bottom: 1px solid gray;
+}
+
+.searchForm input {
+    height: 20px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    outline: none;
+    font-size: 15px;
+    &::placeholder {
+        color: lightgray;
+    }
+}
+
+.userChat{
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    cursor: pointer;
+    &:hover{
+        background-color: rgb(48, 48, 81);
+    }
+}
+
+.userChat img{
+    width: 50px;
+    height: 50px;border-radius: 50%;
+    object-fit: cover;
+}
+
+
+.userChatInfo span{
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.userChatInfo p{
+    font-size: 14px;
+    color: lightgray;
+}
+
+.chatInfo{
+    height: 50px;
+    background-color: rgb(69, 69, 117);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    color: lightgray;
+}
+
+.chatUserInfo{
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.chatUserInfo img{
+    background-color: #fff;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chatIcons{
+    display: flex;
+    gap: 10px;
+}
+
+.chatIcons img{
+    height: 24px;
+    cursor: pointer;
+}
+
+.messages{
+    background-image: url("./img/doodle.png");
+    background-repeat:space;
+    background-color: #cebbf6;
+    padding: 10px;
+    height: calc(100% - 140px);
+    overflow-y: scroll;
+}
+
+.input{
+    height: 30px;
+    background: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.input input{
+    width: 100%;
+    border: none;
+    outline: none;
+    color: gray;
+    font-size: 18px;
+    &::placeholder {
+        color: lightgray;
+    }
+}
+
+.send{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.send img{
+    height: 24px;
+    cursor: pointer;
+}
+
+.send button{
+    border: none;
+    padding: 10px 15px;
+    color: white;
+    background-color:#997cda;
+    border-radius: 5px;
+}
+
+.message{
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+
+    &.owner{
+        flex-direction: row-reverse;
+    }
+}
+
+.messageInfo{
+    display: flex;
+    flex-direction: column;
+    color: gray;
+    font-weight: 300;
+}
+
+.messageInfo img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.messageContent{
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.messageContent img{
+    width: 50%;
+}
+
+.messageContent p{
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 0px 10px 10px 10px;
+    max-width: max-content;
+}
+
+.owner .messageContent{
+    align-items: flex-end;
+}
+
+.owner .messageContent p{
+    background-color: #af93ea;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px 0px 10px 10px;
+    max-width: max-content;
+}
