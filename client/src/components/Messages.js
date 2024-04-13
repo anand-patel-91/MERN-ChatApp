@@ -1,30 +1,39 @@
-import React, { useEffect } from 'react'
-import Message from './Message'
-import { useMessagesContext } from '../hooks/useMessagesContext'
+import React, { useEffect } from "react";
+import Message from "./Message";
+import { useMessagesContext } from "../hooks/useMessagesContext";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const Messages = () => {
+  const { messages, dispatch } = useMessagesContext();
+  const { user } = useAuthContext();
 
-  const {messages, dispatch} = useMessagesContext()
-  useEffect(()=>{
-    const fetchMessages = async()=>{
-      const respnse = await fetch('/api/messages')
-      const json = await respnse.json()
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const respnse = await fetch("/api/messages", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      const json = await respnse.json();
 
-      if(respnse.ok){
-        dispatch({type:'SET_MESSAGES', payload:json})
+      if (respnse.ok) {
+        dispatch({ type: "SET_MESSAGES", payload: json });
       }
-    }
+    };
 
-    fetchMessages()
-  },[dispatch])
+    if (user) {
+      fetchMessages();
+    }
+  }, [dispatch, user]);
 
   return (
-    <div className='messages'>
-        {messages && messages.map((message)=>(
-            <Message message={message} key={message._id}/>
+    <div className="messages">
+      {messages &&
+        messages.map((message) => (
+          <Message message={message} key={message._id} />
         ))}
     </div>
-  )
-}
+  );
+};
 
-export default Messages
+export default Messages;
