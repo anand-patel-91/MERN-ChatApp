@@ -2,14 +2,19 @@ import React, { useEffect } from "react";
 import Message from "./Message";
 import { useMessagesContext } from "../hooks/useMessagesContext";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { useChatContext } from "../hooks/useChatContext";
 
 const Messages = () => {
   const { messages, dispatch } = useMessagesContext();
   const { user } = useAuthContext();
+  const {chatId} = useChatContext();
 
   useEffect(() => {
+    if(chatId===null){
+      return
+    }
     const fetchMessages = async () => {
-      const respnse = await fetch("/api/messages", {
+      const respnse = await fetch(`/api/messages/${chatId}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -24,7 +29,7 @@ const Messages = () => {
     if (user) {
       fetchMessages();
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, chatId]);
 
   return (
     <div className="messages">

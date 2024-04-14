@@ -187,24 +187,6 @@
     align-items: center;
 }
 
-.chatUserInfo img{
-    background-color: #fff;
-    height: 24px;
-    width: 24px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.chatIcons{
-    display: flex;
-    gap: 10px;
-}
-
-.chatIcons img{
-    height: 24px;
-    cursor: pointer;
-}
-
 .messages{
     background-image: url("./img/doodle.png");
     background-repeat:space;
@@ -227,7 +209,7 @@
     width: 100%;
     border: none;
     outline: none;
-    color: gray;
+    color: #111;
     font-size: 18px;
     &::placeholder {
         color: lightgray;
@@ -284,14 +266,7 @@
 
 .owner .messageContent{
     align-items: flex-end;
-}
-
-.owner .messageContent p{
-    background-color: #af93ea;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px 0px 10px 10px;
-    max-width: max-content;
+    align-self: left;
 }
 
 .error{

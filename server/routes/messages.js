@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.use(requireAuth);
 
-router.get("/", getMessages);
+router.get("/:chatId", getMessages);
 
 router.post("/", createMessage);
 

@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const Message = ({ message }) => {
   const { content } = message;
+  const ref = useRef()
+  const {user} = useAuthContext()
+
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  }, [message]);
 
   return (
-    <div className="message">
+    <div ref={ref} className={`message ${message.senderEmail === user.email && "owner"}`}>
       <div className="messageContent">
         <p>{content}</p>
         <span className="messageInfo">
-          {formatDistanceToNow(new Date(message.createdAt), {
+          {formatDistanceToNow(new Date(message.timestamp), {
             addSuffix: true,
           })}
         </span>

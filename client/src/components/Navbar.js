@@ -8,7 +8,6 @@ const Navbar = () => {
   const { user } = useAuthContext();
 
   const handleClick = () => {
-    console.log(user);
     logout();
   };
 

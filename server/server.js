@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const messageRoutes = require("./routes/messages");
 const userRoutes = require("./routes/user");
-const contactRoutes = require("./routes/contacts");
+const userChatRoutes = require("./routes/userChats");
 
 const app = express();
 app.use(express.json());
@@ -12,7 +12,7 @@ app.use("/api/messages", messageRoutes);
 
 app.use("/api/user", userRoutes);
 
-app.use("/api/contacts", contactRoutes);
+app.use("/api/userChats", userChatRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)

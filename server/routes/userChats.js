@@ -1,11 +1,13 @@
 const express = require("express");
 const requireAuth = require("../middleware/requireAuth");
-const getContacts = require("../controllers/contactsController");
+const {getUserChats, setUserChats} = require("../controllers/userChatsController");
 
 const router = express.Router();
 
 router.use(requireAuth);
 
-router.get("/", getContacts);
+router.post('/', setUserChats);
+
+router.get("/:email", getUserChats);
 
 module.exports = router;

@@ -12,6 +12,10 @@ export const messagesReducer = (state, action) =>{
             return {
                 messages: [...state.messages, action.payload]
             }
+        case 'LOGOUT':
+            return{
+                message:[]
+            }
         default:
             return state
     }
