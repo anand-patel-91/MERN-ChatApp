@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 
 const userChatSchema = new Schema(
   {
-    email: {
-      type: String,
+    Id: {
+      type: Schema.Types.ObjectId ,
       required: true,
       unique: true,
     },
@@ -13,7 +13,6 @@ const userChatSchema = new Schema(
       {
         chatId: {
           type: String,
-          unique: false,
           required: true,
         },
         lastMessage: {
@@ -24,8 +23,8 @@ const userChatSchema = new Schema(
             type: String,
             required: true,
           },
-          email: {
-            type: String,
+          Id: {
+            type: Schema.Types.ObjectId ,
             required: true,
           },
         },

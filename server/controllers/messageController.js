@@ -11,12 +11,12 @@ const getMessages = async (req, res) => {
 };
 
 const createMessage = async (req, res) => {
-  const { chatId, content, senderEmail } = req.body;
+  const { chatId, content, senderId } = req.body;
 
   try {
     const chat = await Message.findOneAndUpdate(
       { chatId },
-      { $push: { messages: { content, senderEmail } } },
+      { $push: { messages: { content, senderId } } },
       { upsert: true, new: true }
     );
     res.status(200).json(chat.messages[chat.messages.length - 1]);

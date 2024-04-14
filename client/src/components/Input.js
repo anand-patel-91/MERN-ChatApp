@@ -7,12 +7,12 @@ const Input = () => {
   const [message, setMessage] = useState("");
   const { dispatch } = useMessagesContext();
   const { user } = useAuthContext();
-  const { user: chat, chatId } = useChatContext();
+  const { chat, chatId } = useChatContext();
 
   const saveToMessages = async (text) => {
     const response = await fetch("api/messages/", {
       method: "POST",
-      body: JSON.stringify({ chatId, content: text, senderEmail: user.email }),
+      body: JSON.stringify({ chatId, content: text, senderId: user._id }),
       headers: {
         "Content-type": "application/json",
         Authorization: `Bearer ${user.token}`,
@@ -28,45 +28,37 @@ const Input = () => {
   };
 
   const saveToUserChats = async (text) => {
-    try {
-      const res = await fetch("/api/userChats", {
-        method: "POST",
-        body: JSON.stringify({
-          chatId,
-          content: text,
-          email: user.email,
-          user: chat,
-        }),
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
+    const res1 = await fetch("/api/userChats", {
+      method: "POST",
+      body: JSON.stringify({
+        chatId,
+        content: text,
+        Id: user._id,
+        user:chat
+      }),
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    console.log(res1.json());
+    const res2 = await fetch("/api/userChats", {
+      method: "POST",
+      body: JSON.stringify({
+        chatId,
+        content: text,
+        Id: chat._id,
+        user: {
+          name: user.name,
+          _id: user._id,
         },
-      });
-      console.log(res.json());
-    } catch (error) {
-      console.log(error.message);
-    }
-    try {
-      const res = await fetch("/api/userChats", {
-        method: "POST",
-        body: JSON.stringify({
-          chatId,
-          content: text,
-          email: chat.email,
-          user: {
-            name: user.name,
-            email: user.email,
-          },
-        }),
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      console.log(res.json());
-    } catch (error) {
-      console.log(error.message);
-    }
+      }),
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    console.log(res2.json());
   };
 
   const handleClick = async (text) => {

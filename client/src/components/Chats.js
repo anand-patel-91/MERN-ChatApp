@@ -9,7 +9,7 @@ const Contacts = () => {
 
   useEffect(() => {
     const fetchChats = async () => {
-      const response = await fetch(`/api/userChats/${user.email}`, {
+      const response = await fetch(`/api/userChats/${user._id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -27,8 +27,8 @@ const Contacts = () => {
     }
   }, [user]);
 
-  const handleSelect = (u) => {
-    dispatch({ type: "CHANGE_USER", payload: u });
+  const handleSelect = (chat) => {
+    dispatch({ type: "CHANGE_USER", payload:{name:chat.name, _id:chat.Id} });
   };
 
   return (

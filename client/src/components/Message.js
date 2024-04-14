@@ -14,7 +14,7 @@ const Message = ({ message }) => {
   return (
     <div
       ref={ref}
-      className={`message ${message.senderEmail === user.email && "owner"}`}
+      className={`message ${message.senderId === user._id && "owner"}`}
     >
       <div className="messageContent">
         <p>{content}</p>

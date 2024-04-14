@@ -11,6 +11,6 @@ router.use(requireAuth);
 
 router.post("/", setUserChats);
 
-router.get("/:email", getUserChats);
+router.get("/:_id", getUserChats);
 
 module.exports = router;

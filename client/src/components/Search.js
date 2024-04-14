@@ -3,7 +3,7 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
 
 const Search = () => {
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [chats, setChats] = useState(null);
   const [err, setErr] = useState(null);
 
@@ -13,7 +13,7 @@ const Search = () => {
   const handleSelect = (chat) => {
     dispatch({
       type: "CHANGE_USER",
-      payload: { email: chat.email, name: chat.name },
+      payload: { _id: chat._id, name: chat.name },
     });
   };
 
@@ -21,7 +21,7 @@ const Search = () => {
     setErr(null);
     const response = await fetch("/api/user/search", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ name }),
       headers: {
         "Content-type": "application/json",
         Authorization: `Bearer ${user.token}`,
@@ -31,7 +31,7 @@ const Search = () => {
     const json = await response.json();
 
     if (response.ok) {
-      setEmail("");
+      setName("");
       setChats(json);
     } else {
       setErr({ message: "No such user found" });
@@ -42,13 +42,13 @@ const Search = () => {
     <div className="search">
       <div className="searchForm">
         <input
-          type="email"
-          placeholder="Find a user (enter Email)"
+          type="text"
+          placeholder="Find a user"
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();
           }}
-          onChange={(e) => setEmail(e.target.value.trimStart())}
-          value={email}
+          onChange={(e) => setName(e.target.value.trimStart())}
+          value={name}
         />
       </div>
       {err && <span>{err.message}</span>}

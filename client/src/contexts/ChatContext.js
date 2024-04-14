@@ -10,11 +10,11 @@ export const ChatContextProvider = ({ children }) => {
     switch (action.type) {
       case "CHANGE_USER":
         return {
-          user: action.payload,
+          chat: action.payload,
           chatId:
-            user.email < action.payload.email
-              ? user.email + action.payload.email
-              : action.payload.email + user.email,
+            user._id < action.payload._id
+              ? user._id + action.payload._id
+              : action.payload._id + user._id,
         };
       case "LOGOUT":
         return {

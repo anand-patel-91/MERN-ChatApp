@@ -4,14 +4,14 @@ import Input from "./Input";
 import { useChatContext } from "../hooks/useChatContext";
 
 const Chat = () => {
-  const { user } = useChatContext();
+  const { chat } = useChatContext();
 
-  useEffect(() => {}, [user]);
+  useEffect(() => {}, [chat]);
 
   return (
     <div className="chat">
       <div className="chatInfo">
-        <div className="chatUserInfo">{user && <span>{user.name}</span>}</div>
+        <div className="chatUserInfo">{chat && <span>{chat.name}</span>}</div>
       </div>
       <Messages />
       <Input />

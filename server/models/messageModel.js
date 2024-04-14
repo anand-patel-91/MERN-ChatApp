@@ -13,8 +13,8 @@ const messageSchema = new Schema(
           type: String,
           required: true,
         },
-        senderEmail: {
-          type: String,
+        senderId: {
+          type: Schema.Types.ObjectId ,
           required: true,
         },
         timestamp: {

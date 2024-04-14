@@ -13,7 +13,7 @@ const loginUser = async (req, res) => {
 
     const token = createToken(user._id);
 
-    res.status(200).json({ email, name: user.name, token });
+    res.status(200).json({ email, name: user.name, token, _id:user._id });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -27,18 +27,18 @@ const signupUser = async (req, res) => {
 
     const token = createToken(user._id);
 
-    res.status(200).json({ email, name, token });
+    res.status(200).json({ email, name, token, _id:user._id });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
 const searchUser = async (req, res) => {
-  const { email } = req.body;
+  const { name } = req.body;
   try {
     const users = await User.find(
-      { email: { $regex: new RegExp(email) } },
-      { email: 1, name: 1 }
+      { name: { $regex: new RegExp(name) } },
+      { name: 1, _id: 1 }
     );
 
     if (users.length > 0) {

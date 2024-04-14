@@ -1,26 +1,27 @@
 const UserChat = require("../models/userChatModel");
 
 const getUserChats = async (req, res) => {
-  const { email } = req.params;
-  const messages = await UserChat.find({ email });
+  const { _id } = req.params;
+  const messages = await UserChat.find({ Id:_id });
 
   res.status(200).json(messages);
 };
 
 const setUserChats = async (req, res) => {
-  const { email, chatId, content, user } = req.body;
+  const { Id, chatId, content, user } = req.body;
+  console.log(req.body)
 
   try {
-    let chat = await UserChat.findOne({ email });
+    let chat = await UserChat.findOne({ Id });
 
     if (!chat) {
       chat = new UserChat({
-        email,
+        Id,
         chats: [
           {
             chatId,
             lastMessage: content,
-            userInfo: { email: user.email, name: user.name },
+            userInfo: { Id: user._id, name: user.name },
           },
         ],
       });
@@ -33,7 +34,7 @@ const setUserChats = async (req, res) => {
         chat.chats.push({
           chatId,
           lastMessage: content,
-          userInfo: { email: user.email, name: user.name },
+          userInfo: { Id: user._id, name: user.name },
         });
       }
       await chat.save();
