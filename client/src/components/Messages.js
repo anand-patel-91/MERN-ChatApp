@@ -7,11 +7,11 @@ import { useChatContext } from "../hooks/useChatContext";
 const Messages = () => {
   const { messages, dispatch } = useMessagesContext();
   const { user } = useAuthContext();
-  const {chatId} = useChatContext();
+  const { chatId } = useChatContext();
 
   useEffect(() => {
-    if(chatId===null){
-      return
+    if (chatId === null) {
+      return;
     }
     const fetchMessages = async () => {
       const respnse = await fetch(`/api/messages/${chatId}`, {

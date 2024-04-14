@@ -17,10 +17,10 @@ export const ChatContextProvider = ({ children }) => {
               : action.payload.email + user.email,
         };
       case "LOGOUT":
-        return{
+        return {
           chatId: null,
           chat: {},
-        }
+        };
 
       default:
         return state;

@@ -5,7 +5,7 @@ import { useMessagesContext } from "./useMessagesContext";
 export const useLogout = () => {
   const { dispatch } = useAuthContext();
   const { dispatch: chatDispatch } = useChatContext();
-  const {dispatch: messagesDispatch} = useMessagesContext()
+  const { dispatch: messagesDispatch } = useMessagesContext();
 
   const logout = () => {
     localStorage.removeItem("user");

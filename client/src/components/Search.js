@@ -8,11 +8,13 @@ const Search = () => {
   const [err, setErr] = useState(null);
 
   const { user } = useAuthContext();
-  const {dispatch} = useChatContext()
+  const { dispatch } = useChatContext();
 
-
-  const handleSelect = (chat) => {    
-    dispatch({ type: "CHANGE_USER", payload:{email:chat.email, name:chat.name}});
+  const handleSelect = (chat) => {
+    dispatch({
+      type: "CHANGE_USER",
+      payload: { email: chat.email, name: chat.name },
+    });
   };
 
   const handleSearch = async () => {

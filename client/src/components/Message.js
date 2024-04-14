@@ -4,15 +4,18 @@ import { useAuthContext } from "../hooks/useAuthContext";
 
 const Message = ({ message }) => {
   const { content } = message;
-  const ref = useRef()
-  const {user} = useAuthContext()
+  const ref = useRef();
+  const { user } = useAuthContext();
 
   useEffect(() => {
     ref.current?.scrollIntoView({ behavior: "smooth" });
   }, [message]);
 
   return (
-    <div ref={ref} className={`message ${message.senderEmail === user.email && "owner"}`}>
+    <div
+      ref={ref}
+      className={`message ${message.senderEmail === user.email && "owner"}`}
+    >
       <div className="messageContent">
         <p>{content}</p>
         <span className="messageInfo">

@@ -33,19 +33,22 @@ const signupUser = async (req, res) => {
   }
 };
 
-const searchUser = async(req, res) => {
-  const {email} = req.body
-  try{
-    const users = await User.find({ email: { $regex: new RegExp(email) } }, {email:1, name:1})
+const searchUser = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const users = await User.find(
+      { email: { $regex: new RegExp(email) } },
+      { email: 1, name: 1 }
+    );
 
-    if(users.length > 0){
-      res.status(200).json(users)
-    }else{
-      res.status(404).json({ message: 'No users found.' });
+    if (users.length > 0) {
+      res.status(200).json(users);
+    } else {
+      res.status(404).json({ message: "No users found." });
     }
-  }catch(error){
-    res.status(500).json({ message: 'Internal server error.' });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error." });
   }
-}
+};
 
 module.exports = { signupUser, loginUser, searchUser };

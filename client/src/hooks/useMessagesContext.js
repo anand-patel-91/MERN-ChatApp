@@ -1,12 +1,12 @@
-import { useContext } from "react"
-import { MessagesContext } from "../contexts/MessagesContext"
+import { useContext } from "react";
+import { MessagesContext } from "../contexts/MessagesContext";
 
-export const useMessagesContext = () =>{
-    const context = useContext(MessagesContext)
+export const useMessagesContext = () => {
+  const context = useContext(MessagesContext);
 
-    if(!context){
-        throw Error('Not inside provider')
-    }
+  if (!context) {
+    throw Error("Not inside provider");
+  }
 
-    return context
-}
+  return context;
+};

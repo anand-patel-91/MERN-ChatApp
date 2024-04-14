@@ -1,12 +1,12 @@
-import { useContext } from "react"
-import { AuthContext } from "../contexts/AuthContext"
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
-export const useAuthContext = () =>{
-    const context = useContext(AuthContext)
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
 
-    if(!context){
-        throw Error('Not inside provider')
-    }
+  if (!context) {
+    throw Error("Not inside provider");
+  }
 
-    return context
-}
+  return context;
+};

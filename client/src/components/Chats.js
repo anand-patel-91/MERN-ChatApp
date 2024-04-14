@@ -5,7 +5,7 @@ import { useChatContext } from "../hooks/useChatContext";
 const Contacts = () => {
   const [contacts, setContacts] = useState(null);
   const { user } = useAuthContext();
-  const {dispatch} = useChatContext()
+  const { dispatch } = useChatContext();
 
   useEffect(() => {
     const fetchChats = async () => {

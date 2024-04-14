@@ -8,7 +8,7 @@ const Sidebar = () => {
     <div className="sidebar">
       <Navbar />
       <div className="chats">
-        <Search/>
+        <Search />
         <Contacts />
       </div>
     </div>
