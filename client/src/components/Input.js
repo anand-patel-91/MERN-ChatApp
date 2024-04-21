@@ -28,7 +28,7 @@ const Input = () => {
   };
 
   const saveToUserChats = async (text) => {
-    const res1 = await fetch("/api/userChats", {
+    await fetch("/api/userChats", {
       method: "POST",
       body: JSON.stringify({
         chatId,
@@ -41,8 +41,8 @@ const Input = () => {
         Authorization: `Bearer ${user.token}`,
       },
     });
-    console.log(res1.json());
-    const res2 = await fetch("/api/userChats", {
+    
+    await fetch("/api/userChats", {
       method: "POST",
       body: JSON.stringify({
         chatId,
@@ -58,7 +58,6 @@ const Input = () => {
         Authorization: `Bearer ${user.token}`,
       },
     });
-    console.log(res2.json());
   };
 
   const handleClick = async (text) => {

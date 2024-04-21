@@ -9,7 +9,6 @@ const getUserChats = async (req, res) => {
 
 const setUserChats = async (req, res) => {
   const { Id, chatId, content, user } = req.body;
-  console.log(req.body)
 
   try {
     let chat = await UserChat.findOne({ Id });

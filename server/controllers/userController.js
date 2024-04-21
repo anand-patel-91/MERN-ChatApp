@@ -37,7 +37,7 @@ const searchUser = async (req, res) => {
   const { name } = req.body;
   try {
     const users = await User.find(
-      { name: { $regex: new RegExp(name) } },
+      { name: { $regex: new RegExp(name), $options: "si" } },
       { name: 1, _id: 1 }
     );
 
