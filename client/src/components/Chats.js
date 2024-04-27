@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
+import { useLogout } from "../hooks/useLogout";
 
 const Contacts = () => {
   const [contacts, setContacts] = useState(null);
   const { user } = useAuthContext();
   const { dispatch } = useChatContext();
+  const {logout} = useLogout()
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -16,16 +18,19 @@ const Contacts = () => {
       });
 
       const json = await response.json();
-
       if (response.ok) {
         setContacts(json[0]?.chats);
+      }else{
+        if(json.error === 'Token expired'){
+          logout()
+        }
       }
     };
 
     if (user) {
       fetchChats();
     }
-  }, [user]);
+  }, [user, logout]);
 
   const handleSelect = (chat) => {
     dispatch({ type: "CHANGE_USER", payload:{name:chat.name, _id:chat.Id} });
