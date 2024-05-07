@@ -60,28 +60,29 @@ const Input = () => {
     });
   };
 
-  const handleClick = async (text) => {
-    if (!message.length) return;
+  const handleClick = async () => {
+    let text = message.trim()
+    if (!text.length) return;
 
     if (!user) {
       return;
     }
 
-    saveToMessages(message.trimEnd());
+    saveToMessages(text);
 
-    saveToUserChats(message.trimEnd());
+    saveToUserChats(text);
   };
 
   return (
     <div className="input">
       <input
         type="text"
-        onChange={(e) => setMessage(e.target.value.trimStart())}
+        onChange={(e) => setMessage(e.target.value)}
         value={message}
         onKeyDown={(e) => {
           if (e.key === "Enter") handleClick();
         }}
-        placeholder="Hi.."
+        placeholder="Hi..."
         disabled={!chatId}
       />
       <div className="send">
