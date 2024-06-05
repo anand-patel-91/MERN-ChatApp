@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 const mongoose = require("mongoose");
 require("dotenv").config();
 const messageRoutes = require("./routes/messages");
@@ -7,6 +8,7 @@ const userChatRoutes = require("./routes/userChats");
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 app.use("/api/messages", messageRoutes);
 
