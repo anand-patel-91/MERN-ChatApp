@@ -7,7 +7,7 @@ const userChatRoutes = require("./routes/userChats");
 
 const app = express();
 app.use(express.json());
-app.use(cors({origin:"https://mern-chat-app-frontend-tau.vercel.app/", }));
+app.use(cors());
 
 app.use("/api/messages", messageRoutes);
 
