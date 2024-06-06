@@ -9,10 +9,6 @@ const app = express();
 app.use(express.json());
 app.use(cors({origin:"https://mern-chat-app-frontend-tau.vercel.app/", }));
 
-app.use('/', (req, res)=> {
-    res.send("Server is running");
-})
-
 app.use("/api/messages", messageRoutes);
 
 app.use("/api/user", userRoutes);
