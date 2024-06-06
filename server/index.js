@@ -21,10 +21,10 @@ app.use("/api/user", userRoutes);
 app.use("/api/userChats", userChatRoutes);
 
 mongoose
-  .connect("mongodb+srv://patel91a:ap1403@mern-chatapp.hyq3rkg.mongodb.net/?retryWrites=true&w=majority&appName=MERN-ChatApp")
+  .connect(REACT_APP_MONGO_URI)
   .then(() => {
-    app.listen(4000, () => {
-      console.log("connected to db and listening on port", 4000);
+    app.listen(REACT_APP_PORT, () => {
+      console.log("connected to db and listening on port", REACT_APP_PORT);
     });
   })
   .catch((error) => {
