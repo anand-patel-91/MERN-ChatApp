@@ -10,7 +10,7 @@ const Input = () => {
   const { chat, chatId } = useChatContext();
 
   const saveToMessages = async (text) => {
-    const response = await fetch("api/messages/", {
+    const response = await fetch("https://mern-chat-app-backend-drab.vercel.app/api/messages/", {
       method: "POST",
       body: JSON.stringify({ chatId, content: text, senderId: user._id }),
       headers: {
@@ -28,7 +28,7 @@ const Input = () => {
   };
 
   const saveToUserChats = async (text) => {
-    await fetch("/api/userChats", {
+    await fetch("https://mern-chat-app-backend-drab.vercel.app/api/userChats", {
       method: "POST",
       body: JSON.stringify({
         chatId,
@@ -42,7 +42,7 @@ const Input = () => {
       },
     });
     
-    await fetch("/api/userChats", {
+    await fetch("https://mern-chat-app-backend-drab.vercel.app/api/userChats", {
       method: "POST",
       body: JSON.stringify({
         chatId,

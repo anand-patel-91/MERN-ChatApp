@@ -19,7 +19,7 @@ const Search = () => {
 
   const handleSearch = async () => {
     setErr(null);
-    const response = await fetch("/api/user/search", {
+    const response = await fetch("https://mern-chat-app-backend-drab.vercel.app/api/user/search", {
       method: "POST",
       body: JSON.stringify({ name }),
       headers: {

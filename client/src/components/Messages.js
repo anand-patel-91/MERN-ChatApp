@@ -14,7 +14,7 @@ const Messages = () => {
       return;
     }
     const fetchMessages = async () => {
-      const respnse = await fetch(`/api/messages/${chatId}`, {
+      const respnse = await fetch(`https://mern-chat-app-backend-drab.vercel.app/api/messages/${chatId}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
