@@ -11,7 +11,25 @@ const messageSchema = new Schema(
       {
         content: {
           type: String,
-          required: true,
+          default: "",
+        },
+        attachment: {
+          name: {
+            type: String,
+            maxlength: 200,
+          },
+          type: {
+            type: String,
+            maxlength: 100,
+          },
+          size: {
+            type: Number,
+            max: 5242880,
+          },
+          data: {
+            type: String,
+            maxlength: 7200000,
+          },
         },
         senderId: {
           type: Schema.Types.ObjectId ,

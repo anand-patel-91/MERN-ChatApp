@@ -11,6 +11,7 @@ export const ChatContextProvider = ({ children }) => {
       case "CHANGE_USER":
         return {
           chat: action.payload,
+          searchVersion: state.searchVersion + 1,
           chatId:
             user._id < action.payload._id
               ? user._id + action.payload._id
@@ -21,10 +22,16 @@ export const ChatContextProvider = ({ children }) => {
           ...state,
           chat: { ...state.chat, ...action.payload },
         };
+      case "CLEAR_SEARCH":
+        return {
+          ...state,
+          searchVersion: state.searchVersion + 1,
+        };
       case "LOGOUT":
         return {
           chatId: null,
           chat: {},
+          searchVersion: state.searchVersion + 1,
         };
 
       default:
@@ -35,6 +42,7 @@ export const ChatContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(chatReducer, {
     chatId: null,
     chat: {},
+    searchVersion: 0,
   });
 
   return (

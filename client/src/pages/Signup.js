@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSignup } from "../hooks/useSignup";
+import { compressImage } from "../utils/compressImage";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +18,7 @@ const Signup = () => {
     await signup(email, name, password, profilePic);
   };
 
-  const handlePhotoChange = (event) => {
+  const handlePhotoChange = async (event) => {
     const file = event.target.files[0];
     event.target.value = "";
     setImageError("");
@@ -29,9 +30,13 @@ const Signup = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => setProfilePic(reader.result);
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file);
+      setProfilePic(compressed.data);
+    } catch (error) {
+      setProfilePic("");
+      setImageError("Unable to prepare this image");
+    }
   };
 
   return (

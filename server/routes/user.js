@@ -8,6 +8,8 @@ const {
   searchUser,
   updateProfilePicture,
   updateProfile,
+  getUserProfile,
+  getProfilePicture,
 } = require("../controllers/userController");
 const requireAuth = require("../middleware/requireAuth");
 
@@ -15,9 +17,14 @@ router.post("/login", loginUser);
 
 router.post("/signup", signupUser);
 
+// Image elements cannot attach the app's Authorization header.
+router.get("/profile/:_id/picture", getProfilePicture);
+
 router.use(requireAuth);
 
 router.post("/search", searchUser);
+
+router.get("/profile/:_id", getUserProfile);
 
 router.patch("/profile-picture", updateProfilePicture);
 

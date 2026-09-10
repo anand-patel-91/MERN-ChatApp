@@ -4,6 +4,9 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
+const profilePictureUrl = (req, userId) =>
+  `${req.protocol}://${req.get("host")}/api/user/profile/${userId}/picture`;
+
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
@@ -16,7 +19,13 @@ const loginUser = async (req, res) => {
 
     const token = createToken(user._id);
 
-    res.status(200).json({ email: user.email, name: user.name, profilePic: user.profilePic, token, _id: user._id });
+    res.status(200).json({
+      email: user.email,
+      name: user.name,
+      profilePic: user.profilePic ? profilePictureUrl(req, user._id) : "",
+      token,
+      _id: user._id,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -30,7 +39,13 @@ const signupUser = async (req, res) => {
 
     const token = createToken(user._id);
 
-    res.status(200).json({ email: user.email, name: user.name, profilePic: user.profilePic, token, _id: user._id });
+    res.status(200).json({
+      email: user.email,
+      name: user.name,
+      profilePic: user.profilePic ? profilePictureUrl(req, user._id) : "",
+      token,
+      _id: user._id,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -55,7 +70,10 @@ const updateProfilePicture = async (req, res) => {
       { new: true, runValidators: true }
     ).select("_id email name profilePic");
 
-    return res.status(200).json(user);
+    return res.status(200).json({
+      ...user.toObject(),
+      profilePic: profilePictureUrl(req, user._id),
+    });
   } catch (error) {
     return res.status(400).json({ error: "Unable to update profile picture" });
   }
@@ -128,7 +146,10 @@ const updateProfile = async (req, res) => {
       );
     }
 
-    return res.status(200).json(user);
+    return res.status(200).json({
+      ...user,
+      profilePic: user.profilePic ? profilePictureUrl(req, user._id) : "",
+    });
   } catch (error) {
     return res.status(400).json({ error: "Unable to update profile" });
   }
@@ -146,7 +167,7 @@ const searchUser = async (req, res) => {
   try {
     const users = await User.find(
       { name: { $regex: escapedName, $options: "i" } },
-      { name: 1, profilePic: 1 }
+      { name: 1 }
     ).limit(20).lean();
 
     if (users.length > 0) {
@@ -159,10 +180,49 @@ const searchUser = async (req, res) => {
   }
 };
 
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params._id)
+      .select("_id name profilePic")
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      profilePic: user.profilePic ? profilePictureUrl(req, user._id) : "",
+    });
+  } catch (error) {
+    return res.status(400).json({ error: "Invalid user" });
+  }
+};
+
+const getProfilePicture = async (req, res) => {
+  try {
+    const user = await User.findById(req.params._id).select("profilePic").lean();
+    const match = user?.profilePic?.match(/^data:image\/([^;]+);base64,(.+)$/);
+
+    if (!match) {
+      return res.status(404).end();
+    }
+
+    res.set("Cache-Control", "public, max-age=300");
+    res.type(`image/${match[1]}`);
+    return res.send(Buffer.from(match[2], "base64"));
+  } catch (error) {
+    return res.status(404).end();
+  }
+};
+
 module.exports = {
   signupUser,
   loginUser,
   searchUser,
   updateProfilePicture,
   updateProfile,
+  getUserProfile,
+  getProfilePicture,
 };

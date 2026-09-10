@@ -4,6 +4,10 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
 import { useMessagesContext } from "../hooks/useMessagesContext";
 import { API_URL } from "../config";
+import { uploadJson } from "../utils/uploadJson";
+import ImageModal from "../components/ImageModal";
+import ProgressBar from "../components/ProgressBar";
+import { compressImage } from "../utils/compressImage";
 
 const Settings = () => {
   const { user, dispatch } = useAuthContext();
@@ -17,8 +21,10 @@ const Settings = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [showImage, setShowImage] = useState(false);
 
-  const handlePhotoChange = (event) => {
+  const handlePhotoChange = async (event) => {
     const file = event.target.files[0];
     event.target.value = "";
     setError("");
@@ -29,9 +35,12 @@ const Settings = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => setProfilePic(reader.result);
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file);
+      setProfilePic(compressed.data);
+    } catch (error) {
+      setError("Unable to prepare this image");
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -39,6 +48,7 @@ const Settings = () => {
     setError("");
     setSuccess("");
     setLoading(true);
+    setUploadProgress(0);
 
     const body = {};
     if (name.trim() !== user.name) body.name = name.trim();
@@ -55,23 +65,24 @@ const Settings = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/user/profile`, {
+      const result = await uploadJson({
         method: "PATCH",
+        url: `${API_URL}/api/user/profile`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
-        body: JSON.stringify(body),
+        body,
+        onProgress: profilePic ? setUploadProgress : undefined,
       });
-      const json = await response.json();
 
-      if (!response.ok) {
-        setError(json.error || "Unable to update profile");
+      if (!result.ok) {
+        setError(result.json.error || "Unable to update profile");
         setLoading(false);
         return;
       }
 
-      const updatedUser = { ...user, ...json };
+      const updatedUser = { ...user, ...result.json };
       localStorage.setItem("user", JSON.stringify(updatedUser));
       dispatch({ type: "LOGIN", payload: updatedUser });
       chatDispatch({ type: "LOGOUT" });
@@ -99,7 +110,9 @@ const Settings = () => {
           <div className="settings-photo-row">
             <div className="settings-avatar">
               {(profilePic || user?.profilePic) && (
-                <img src={profilePic || user.profilePic} alt="Profile preview" />
+                <button className="image-button" type="button" onClick={() => setShowImage(true)}>
+                  <img src={profilePic || user.profilePic} alt="Profile preview" />
+                </button>
               )}
             </div>
             <label className="settings-file-label" htmlFor="settings-profile-pic">
@@ -112,6 +125,7 @@ const Settings = () => {
               />
             </label>
           </div>
+          {profilePic && loading && <ProgressBar value={uploadProgress} />}
 
           <label htmlFor="settings-name">Username</label>
           <input
@@ -147,6 +161,13 @@ const Settings = () => {
           </button>
         </form>
       </section>
+      {showImage && (
+        <ImageModal
+          src={profilePic || user?.profilePic}
+          alt="Profile picture"
+          onClose={() => setShowImage(false)}
+        />
+      )}
     </main>
   );
 };

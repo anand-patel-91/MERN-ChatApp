@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import Messages from "./Messages";
 import Input from "./Input";
 import { useChatContext } from "../hooks/useChatContext";
 import { useMessagesContext } from "../hooks/useMessagesContext";
+import ImageModal from "./ImageModal";
 
 const Chat = () => {
   const { chat, dispatch } = useChatContext();
   const { dispatch: messagesDispatch } = useMessagesContext();
+  const [showImage, setShowImage] = useState(false);
 
   const handleBack = () => {
     dispatch({ type: "LOGOUT" });
@@ -27,7 +29,11 @@ const Chat = () => {
           </button>
         )}
         <div className="chatUserInfo">
-          {chat?.profilePic && <img src={chat.profilePic} alt="" />}
+          {chat?.profilePic && (
+            <button className="image-button chat-avatar-button" type="button" onClick={() => setShowImage(true)}>
+              <img src={chat.profilePic} alt="" />
+            </button>
+          )}
           <span>{chat?.name || "Select a conversation"}</span>
         </div>
       </div>
@@ -40,6 +46,13 @@ const Chat = () => {
         </div>
       )}
       <Input />
+      {showImage && (
+        <ImageModal
+          src={chat.profilePic}
+          alt={`${chat.name} profile picture`}
+          onClose={() => setShowImage(false)}
+        />
+      )}
     </div>
   );
 };

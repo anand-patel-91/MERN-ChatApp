@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
 import { useLogout } from "../hooks/useLogout";
 import { API_URL } from "../config";
+import ImageModal from "./ImageModal";
 
 const Contacts = () => {
   const [contacts, setContacts] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const contactsFingerprint = useRef("");
   const { user } = useAuthContext();
-  const { chat, dispatch } = useChatContext();
+  const { chat: activeChat, dispatch } = useChatContext();
   const {logout} = useLogout()
 
   useEffect(() => {
@@ -26,17 +29,26 @@ const Contacts = () => {
               new Date(secondChat.lastMessageAt || 0) -
               new Date(firstChat.lastMessageAt || 0)
           );
-          setContacts(nextContacts);
+          const nextFingerprint = nextContacts
+            .map(
+              (contact) =>
+                `${contact.chatId}:${contact.lastMessageAt || ""}:${contact.unreadCount || 0}:${contact.userInfo.name}`
+            )
+            .join("|");
+
+          if (nextFingerprint !== contactsFingerprint.current) {
+            contactsFingerprint.current = nextFingerprint;
+            setContacts(nextContacts);
+          }
 
           const activeContact = nextContacts.find(
-            (contact) => contact.userInfo.Id === chat?._id
+            (contact) => contact.userInfo.Id === activeChat?._id
           );
-          if (activeContact) {
+          if (activeContact && activeContact.userInfo.name !== activeChat?.name) {
             dispatch({
               type: "UPDATE_CHAT_USER",
               payload: {
                 name: activeContact.userInfo.name,
-                profilePic: activeContact.userInfo.profilePic,
               },
             });
           }
@@ -53,13 +65,33 @@ const Contacts = () => {
       const pollingId = setInterval(fetchChats, 2000);
       return () => clearInterval(pollingId);
     }
-  }, [user, logout, chat?._id, dispatch]);
+  }, [user, logout, activeChat?._id, activeChat?.name, dispatch]);
 
-  const handleSelect = async (chat, chatId) => {
-    dispatch({
-      type: "CHANGE_USER",
-      payload: { name: chat.name, _id: chat.Id, profilePic: chat.profilePic },
-    });
+  const handleSelect = async (selectedContact, chatId) => {
+    const isSameChat = activeChat?._id === selectedContact.Id;
+
+    if (!isSameChat) {
+      dispatch({
+        type: "CHANGE_USER",
+        payload: { name: selectedContact.name, _id: selectedContact.Id },
+      });
+
+      fetch(`${API_URL}/api/user/profile/${selectedContact.Id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((profile) => {
+          if (profile) {
+            dispatch({
+              type: "UPDATE_CHAT_USER",
+              payload: { name: profile.name, profilePic: profile.profilePic },
+            });
+          }
+        })
+        .catch(() => {});
+    } else {
+      dispatch({ type: "CLEAR_SEARCH" });
+    }
 
     setContacts((currentContacts) =>
       currentContacts?.map((contact) =>
@@ -84,9 +116,28 @@ const Contacts = () => {
             key={contact.chatId}
             onClick={() => handleSelect(contact.userInfo, contact.chatId)}
           >
-            {contact.userInfo.profilePic && (
-              <img src={contact.userInfo.profilePic} alt="" />
-            )}
+            <button
+              className="image-button contact-avatar-button"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                setSelectedImage(
+                  `${API_URL}/api/user/profile/${contact.userInfo.Id}/picture`
+                );
+              }}
+            >
+              <span className="contact-initial">
+                {contact.userInfo.name.charAt(0).toUpperCase()}
+              </span>
+              <img
+                src={`${API_URL}/api/user/profile/${contact.userInfo.Id}/picture`}
+                alt=""
+                loading="eager"
+                onError={(event) => {
+                  event.currentTarget.style.display = "none";
+                }}
+              />
+            </button>
             <div className="userChatInfo">
               <span>{contact.userInfo.name}</span>
               <p>{contact.lastMessage}</p>
@@ -98,6 +149,13 @@ const Contacts = () => {
             )}
           </div>
         ))}
+      {selectedImage && (
+        <ImageModal
+          src={selectedImage}
+          alt="Contact profile picture"
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   );
 };

@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
 import { useAuthContext } from "../hooks/useAuthContext";
+import ImageModal from "./ImageModal";
 
 const Navbar = () => {
   const { logout } = useLogout();
   const { user } = useAuthContext();
+  const [showImage, setShowImage] = useState(false);
 
   const handleClick = () => {
     logout();
@@ -18,9 +20,9 @@ const Navbar = () => {
       </Link>
       <div className="nav-user">
         {user?.profilePic && (
-          <div className="profile-avatar">
+          <button className="profile-avatar image-button" type="button" onClick={() => setShowImage(true)}>
             <img src={user.profilePic} alt="Profile" />
-          </div>
+          </button>
         )}
         <Link className="nav-username" to="/settings">
           {user && user.name}
@@ -29,6 +31,13 @@ const Navbar = () => {
           Log Out
         </button>
       </div>
+      {showImage && (
+        <ImageModal
+          src={user.profilePic}
+          alt="Profile picture"
+          onClose={() => setShowImage(false)}
+        />
+      )}
     </div>
   );
 };

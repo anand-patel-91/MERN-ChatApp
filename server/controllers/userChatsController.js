@@ -15,7 +15,9 @@ const getUserChats = async (req, res) => {
     return res.status(403).json({ error: "You cannot access these chats" });
   }
 
-  const messages = await UserChat.find({ Id: req.user._id }).lean();
+  const messages = await UserChat.find({ Id: req.user._id })
+    .select({ "chats.userInfo.profilePic": 0 })
+    .lean();
 
   messages.forEach((userChats) => {
     userChats.chats.sort(
@@ -23,6 +25,10 @@ const getUserChats = async (req, res) => {
         new Date(secondChat.lastMessageAt || 0) -
         new Date(firstChat.lastMessageAt || 0)
     );
+    userChats.chats.forEach((chat) => {
+      chat.userInfo.hasProfilePic = Boolean(chat.userInfo.profilePic);
+      delete chat.userInfo.profilePic;
+    });
   });
 
   res.status(200).json(messages);

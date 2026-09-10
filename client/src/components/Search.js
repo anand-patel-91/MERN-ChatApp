@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
 import { API_URL } from "../config";
@@ -9,13 +9,37 @@ const Search = () => {
   const [err, setErr] = useState(null);
 
   const { user } = useAuthContext();
-  const { dispatch } = useChatContext();
+  const { dispatch, searchVersion } = useChatContext();
 
-  const handleSelect = (chat) => {
+  useEffect(() => {
+    setName("");
+    setChats(null);
+    setErr(null);
+  }, [searchVersion]);
+
+  const handleSelect = async (chat) => {
+    setName("");
+    setChats(null);
+    setErr(null);
+
     dispatch({
       type: "CHANGE_USER",
-      payload: { _id: chat._id, name: chat.name, profilePic: chat.profilePic },
+      payload: { _id: chat._id, name: chat.name },
     });
+
+    fetch(`${API_URL}/api/user/profile/${chat._id}`, {
+      headers: { Authorization: `Bearer ${user.token}` },
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((profile) => {
+        if (profile) {
+          dispatch({
+            type: "UPDATE_CHAT_USER",
+            payload: { name: profile.name, profilePic: profile.profilePic },
+          });
+        }
+      })
+      .catch(() => {});
   };
 
   const handleSearch = async () => {
@@ -60,7 +84,7 @@ const Search = () => {
             onClick={() => handleSelect(chat)}
             key={chat._id}
           >
-            {chat.profilePic && <img src={chat.profilePic} alt="" />}
+            <div className="contact-initial">{chat.name.charAt(0).toUpperCase()}</div>
             <div className="userChatInfo">
               <span>{chat.name}</span>
             </div>

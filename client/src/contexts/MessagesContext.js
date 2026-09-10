@@ -12,6 +12,15 @@ export const messagesReducer = (state, action) => {
       return {
         messages: [...state.messages, action.payload],
       };
+    case "APPEND_MESSAGES":
+      return {
+        messages: [
+          ...state.messages,
+          ...action.payload.filter(
+            (message) => !state.messages.some((item) => item._id === message._id)
+          ),
+        ],
+      };
     case "LOGOUT":
       return {
         messages: null,
