@@ -7,7 +7,7 @@ import { API_URL } from "../config";
 const Contacts = () => {
   const [contacts, setContacts] = useState(null);
   const { user } = useAuthContext();
-  const { dispatch } = useChatContext();
+  const { chat, dispatch } = useChatContext();
   const {logout} = useLogout()
 
   useEffect(() => {
@@ -21,7 +21,25 @@ const Contacts = () => {
 
         const json = await response.json();
         if (response.ok) {
-          setContacts(json[0]?.chats || []);
+          const nextContacts = (json[0]?.chats || []).sort(
+            (firstChat, secondChat) =>
+              new Date(secondChat.lastMessageAt || 0) -
+              new Date(firstChat.lastMessageAt || 0)
+          );
+          setContacts(nextContacts);
+
+          const activeContact = nextContacts.find(
+            (contact) => contact.userInfo.Id === chat?._id
+          );
+          if (activeContact) {
+            dispatch({
+              type: "UPDATE_CHAT_USER",
+              payload: {
+                name: activeContact.userInfo.name,
+                profilePic: activeContact.userInfo.profilePic,
+              },
+            });
+          }
         } else if (response.status === 401) {
           logout();
         }
@@ -35,7 +53,7 @@ const Contacts = () => {
       const pollingId = setInterval(fetchChats, 2000);
       return () => clearInterval(pollingId);
     }
-  }, [user, logout]);
+  }, [user, logout, chat?._id, dispatch]);
 
   const handleSelect = async (chat, chatId) => {
     dispatch({

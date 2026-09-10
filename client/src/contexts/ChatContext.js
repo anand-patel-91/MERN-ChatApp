@@ -16,6 +16,11 @@ export const ChatContextProvider = ({ children }) => {
               ? user._id + action.payload._id
               : action.payload._id + user._id,
         };
+      case "UPDATE_CHAT_USER":
+        return {
+          ...state,
+          chat: { ...state.chat, ...action.payload },
+        };
       case "LOGOUT":
         return {
           chatId: null,

@@ -28,6 +28,13 @@ const Messages = () => {
 
         if (!cancelled && response.ok) {
           dispatch({ type: "SET_MESSAGES", payload: json });
+
+          await fetch(`${API_URL}/api/userChats/${chatId}/read`, {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          });
         }
       } catch (error) {
         if (!cancelled) {

@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { useChatContext } from "../hooks/useChatContext";
+import { useMessagesContext } from "../hooks/useMessagesContext";
 import { API_URL } from "../config";
 
 const Settings = () => {
   const { user, dispatch } = useAuthContext();
+  const navigate = useNavigate();
+  const { dispatch: chatDispatch } = useChatContext();
+  const { dispatch: messagesDispatch } = useMessagesContext();
   const [name, setName] = useState(user?.name || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -69,11 +74,9 @@ const Settings = () => {
       const updatedUser = { ...user, ...json };
       localStorage.setItem("user", JSON.stringify(updatedUser));
       dispatch({ type: "LOGIN", payload: updatedUser });
-      setCurrentPassword("");
-      setNewPassword("");
-      setProfilePic("");
-      setSuccess("Profile updated");
-      setLoading(false);
+      chatDispatch({ type: "LOGOUT" });
+      messagesDispatch({ type: "LOGOUT" });
+      navigate("/");
     } catch (requestError) {
       setError("Unable to update profile");
       setLoading(false);

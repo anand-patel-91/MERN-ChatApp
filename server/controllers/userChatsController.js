@@ -17,6 +17,14 @@ const getUserChats = async (req, res) => {
 
   const messages = await UserChat.find({ Id: req.user._id }).lean();
 
+  messages.forEach((userChats) => {
+    userChats.chats.sort(
+      (firstChat, secondChat) =>
+        new Date(secondChat.lastMessageAt || 0) -
+        new Date(firstChat.lastMessageAt || 0)
+    );
+  });
+
   res.status(200).json(messages);
 };
 
@@ -61,6 +69,7 @@ const setUserChats = async (req, res) => {
   }
 
   try {
+    const lastMessageAt = new Date();
     const chatUser = await User.findById(user._id).select("name profilePic").lean();
     if (!chatUser) {
       return res.status(400).json({ error: "Chat user not found" });
@@ -76,6 +85,7 @@ const setUserChats = async (req, res) => {
           {
             chatId,
             lastMessage: content.trim(),
+            lastMessageAt,
             unreadCount: isRecipient ? 1 : 0,
             userInfo: { Id: user._id, name: chatUser.name, profilePic: chatUser.profilePic },
           },
@@ -86,6 +96,7 @@ const setUserChats = async (req, res) => {
       const existingChat = chat.chats.find((c) => c.chatId === chatId);
       if (existingChat) {
         existingChat.lastMessage = content.trim();
+        existingChat.lastMessageAt = lastMessageAt;
         if (isRecipient) {
           existingChat.unreadCount = (existingChat.unreadCount || 0) + 1;
         }
@@ -93,6 +104,7 @@ const setUserChats = async (req, res) => {
         chat.chats.push({
           chatId,
           lastMessage: content.trim(),
+          lastMessageAt,
           unreadCount: isRecipient ? 1 : 0,
           userInfo: { Id: user._id, name: chatUser.name, profilePic: chatUser.profilePic },
         });

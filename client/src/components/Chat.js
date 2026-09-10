@@ -16,19 +16,29 @@ const Chat = () => {
   return (
     <div className="chat">
       <div className="chatInfo">
-        <button
-          className="mobile-back"
-          onClick={handleBack}
-          aria-label="Back to contacts"
-        >
-          &larr;
-        </button>
+        {chat?._id && (
+          <button
+            className="chat-exit"
+            onClick={handleBack}
+            aria-label="Exit conversation"
+          >
+            <span className="chat-exit-desktop">&times;</span>
+            <span className="chat-exit-mobile">&larr;</span>
+          </button>
+        )}
         <div className="chatUserInfo">
           {chat?.profilePic && <img src={chat.profilePic} alt="" />}
           <span>{chat?.name || "Select a conversation"}</span>
         </div>
       </div>
-      <Messages />
+      {chat?._id ? (
+        <Messages />
+      ) : (
+        <div className="chat-empty">
+          <strong>Your conversations live here</strong>
+          <span>Select someone from the sidebar to start chatting.</span>
+        </div>
+      )}
       <Input />
     </div>
   );
