@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import Settings from "./pages/Settings";
 import { useAuthContext } from "./hooks/useAuthContext";
 
 function App() {
@@ -23,6 +24,10 @@ function App() {
             <Route
               path="/signup"
               element={!user ? <Signup /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/settings"
+              element={user ? <Settings /> : <Navigate to="/login" />}
             />
           </Routes>
         </div>

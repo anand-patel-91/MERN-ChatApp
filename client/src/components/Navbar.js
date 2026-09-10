@@ -22,7 +22,9 @@ const Navbar = () => {
             <img src={user.profilePic} alt="Profile" />
           </div>
         )}
-        <span>{user && user.name}</span>
+        <Link className="nav-username" to="/settings">
+          {user && user.name}
+        </Link>
         <button className="logout" onClick={handleClick}>
           Log Out
         </button>

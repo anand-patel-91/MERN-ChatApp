@@ -38,7 +38,10 @@ const Contacts = () => {
   }, [user, logout]);
 
   const handleSelect = async (chat, chatId) => {
-    dispatch({ type: "CHANGE_USER", payload:{name:chat.name, _id:chat.Id} });
+    dispatch({
+      type: "CHANGE_USER",
+      payload: { name: chat.name, _id: chat.Id, profilePic: chat.profilePic },
+    });
 
     setContacts((currentContacts) =>
       currentContacts?.map((contact) =>

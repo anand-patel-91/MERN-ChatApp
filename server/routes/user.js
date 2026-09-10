@@ -7,6 +7,7 @@ const {
   loginUser,
   searchUser,
   updateProfilePicture,
+  updateProfile,
 } = require("../controllers/userController");
 const requireAuth = require("../middleware/requireAuth");
 
@@ -19,5 +20,7 @@ router.use(requireAuth);
 router.post("/search", searchUser);
 
 router.patch("/profile-picture", updateProfilePicture);
+
+router.patch("/profile", updateProfile);
 
 module.exports = router;

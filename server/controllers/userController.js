@@ -1,4 +1,7 @@
 const User = require("../models/userModel");
+const UserChat = require("../models/userChatModel");
+const bcrypt = require("bcrypt");
+const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
 const createToken = (_id) => {
@@ -58,6 +61,79 @@ const updateProfilePicture = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  const { name, currentPassword, newPassword, profilePic } = req.body;
+  const updates = {};
+
+  if (name !== undefined) {
+    if (typeof name !== "string" || !name.trim() || name.trim().length > 50) {
+      return res.status(400).json({ error: "Name must be between 1 and 50 characters" });
+    }
+    updates.name = name.trim();
+  }
+
+  if (newPassword !== undefined || currentPassword !== undefined) {
+    if (
+      typeof currentPassword !== "string" ||
+      typeof newPassword !== "string" ||
+      !currentPassword ||
+      !validator.isStrongPassword(newPassword)
+    ) {
+      return res.status(400).json({ error: "Enter your current password and a strong new password" });
+    }
+
+    const user = await User.findById(req.user._id).select("password");
+    const passwordMatches = await bcrypt.compare(currentPassword, user.password);
+    if (!passwordMatches) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    updates.password = await bcrypt.hash(newPassword, 10);
+  }
+
+  if (profilePic !== undefined) {
+    if (
+      typeof profilePic !== "string" ||
+      profilePic.length > 3000000 ||
+      !/^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$/.test(profilePic)
+    ) {
+      return res.status(400).json({ error: "Use a valid image under 2 MB" });
+    }
+    updates.profilePic = profilePic;
+  }
+
+  if (!Object.keys(updates).length) {
+    return res.status(400).json({ error: "No profile changes supplied" });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+      runValidators: true,
+    }).select("_id email name profilePic").lean();
+
+    const contactUpdates = {};
+    if (updates.name) {
+      contactUpdates["chats.$[chat].userInfo.name"] = user.name;
+    }
+    if (updates.profilePic !== undefined) {
+      contactUpdates["chats.$[chat].userInfo.profilePic"] = user.profilePic;
+    }
+
+    if (Object.keys(contactUpdates).length) {
+      await UserChat.updateMany(
+        { "chats.userInfo.Id": req.user._id },
+        { $set: contactUpdates },
+        { arrayFilters: [{ "chat.userInfo.Id": req.user._id }] }
+      );
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(400).json({ error: "Unable to update profile" });
+  }
+};
+
 const searchUser = async (req, res) => {
   const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
 
@@ -83,4 +159,10 @@ const searchUser = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, loginUser, searchUser, updateProfilePicture };
+module.exports = {
+  signupUser,
+  loginUser,
+  searchUser,
+  updateProfilePicture,
+  updateProfile,
+};
