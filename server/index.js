@@ -25,11 +25,17 @@ app.use("/api/userChats", userChatRoutes);
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(port, () => {
-      console.log("connected to db and listening on port", port);
-    });
+    if (!process.env.VERCEL) {
+      app.listen(port, () => {
+        console.log("connected to db and listening on port", port);
+      });
+    }
   })
   .catch((error) => {
     console.error("Database connection failed:", error.message);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   });
+
+module.exports = app;
