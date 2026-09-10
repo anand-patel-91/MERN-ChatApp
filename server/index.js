@@ -1,12 +1,19 @@
 const express = require("express");
-const cors = require('cors');
+const cors = require("cors");
+require("dotenv").config();
 const mongoose = require("mongoose");
 const messageRoutes = require("./routes/messages");
 const userRoutes = require("./routes/user");
 const userChatRoutes = require("./routes/userChats");
 
 const app = express();
-app.use(express.json());
+const port = process.env.PORT || 4000;
+
+if (!process.env.JWT_SECRET || !process.env.MONGODB_URI) {
+  throw new Error("JWT_SECRET and MONGODB_URI must be set in server/.env");
+}
+
+app.use(express.json({ limit: "10kb" }));
 app.use(cors());
 
 app.use("/api/messages", messageRoutes);
@@ -16,12 +23,13 @@ app.use("/api/user", userRoutes);
 app.use("/api/userChats", userChatRoutes);
 
 mongoose
-  .connect("mongodb+srv://patel91a:ap1403@mern-chatapp.hyq3rkg.mongodb.net/?retryWrites=true&w=majority&appName=MERN-ChatApp")
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(4000, () => {
-      console.log("connected to db and listening on port", 4000);
+    app.listen(port, () => {
+      console.log("connected to db and listening on port", port);
     });
   })
   .catch((error) => {
-    console.log(error);
+    console.error("Database connection failed:", error.message);
+    process.exit(1);
   });

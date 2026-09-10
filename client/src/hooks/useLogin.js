@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuthContext } from "./useAuthContext";
+import { API_URL } from "../config";
 
 export const useLogin = () => {
   const [error, setError] = useState(null);
@@ -10,7 +11,7 @@ export const useLogin = () => {
     setLoading(true);
     setError(null);
 
-    const response = await fetch("https://mern-chat-app-backend-drab.vercel.app/api/user/login", {
+    const response = await fetch(`${API_URL}/api/user/login`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",

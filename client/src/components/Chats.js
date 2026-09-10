@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
 import { useLogout } from "../hooks/useLogout";
+import { API_URL } from "../config";
 
 const Contacts = () => {
   const [contacts, setContacts] = useState(null);
@@ -11,7 +12,7 @@ const Contacts = () => {
 
   useEffect(() => {
     const fetchChats = async () => {
-      const response = await fetch(`https://mern-chat-app-backend-drab.vercel.app/api/userChats/${user._id}`, {
+      const response = await fetch(`${API_URL}/api/userChats/${user._id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

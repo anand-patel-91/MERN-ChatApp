@@ -8,18 +8,23 @@ const requireAuth = async (req, res, next) => {
     return res.status(401).json({ error: "Authorization token required" });
   }
 
-  const token = authorization.split(" ")[1];
+  const [scheme, token] = authorization.split(" ");
+
+  if (scheme !== "Bearer" || !token) {
+    return res.status(401).json({ error: "Request is not authorized" });
+  }
 
   try {
-    const { _id } = jwt.verify(token, "anandpatelsecretkey");
+    const { _id } = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = await User.findOne({ _id }).select("_id");
+    if (!req.user) {
+      return res.status(401).json({ error: "Request is not authorized" });
+    }
+
     next();
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired' });
-    }
-    else res.status(401).json({ error: "Request is not authorized" });
+    return res.status(401).json({ error: "Request is not authorized" });
   }
 };
 

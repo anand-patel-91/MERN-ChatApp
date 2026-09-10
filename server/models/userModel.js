@@ -9,10 +9,14 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+    lowercase: true,
+    trim: true,
   },
   name: {
     type: String,
     required: true,
+    trim: true,
+    maxlength: 50,
   },
   password: {
     type: String,
@@ -21,6 +25,9 @@ const userSchema = new Schema({
 });
 
 userSchema.statics.signup = async function (email, name, password) {
+  email = typeof email === "string" ? email.trim().toLowerCase() : email;
+  name = typeof name === "string" ? name.trim() : name;
+
   if (!email || !name || !password) {
     throw Error("All Fields must be filled");
   }
@@ -49,6 +56,8 @@ userSchema.statics.signup = async function (email, name, password) {
 };
 
 userSchema.statics.login = async function (email, password) {
+  email = typeof email === "string" ? email.trim().toLowerCase() : email;
+
   if (!email || !password) {
     throw Error("All Fields must be filled");
   }
@@ -56,7 +65,7 @@ userSchema.statics.login = async function (email, password) {
   const user = await this.findOne({ email });
 
   if (!user) {
-    throw Error("User not found");
+    throw Error("Invalid email or password");
   }
 
   const match = await bcrypt.compare(password, user.password);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
+import { API_URL } from "../config";
 
 const Search = () => {
   const [name, setName] = useState("");
@@ -19,7 +20,7 @@ const Search = () => {
 
   const handleSearch = async () => {
     setErr(null);
-    const response = await fetch("https://mern-chat-app-backend-drab.vercel.app/api/user/search", {
+    const response = await fetch(`${API_URL}/api/user/search`, {
       method: "POST",
       body: JSON.stringify({ name }),
       headers: {
