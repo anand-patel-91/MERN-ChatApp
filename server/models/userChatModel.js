@@ -18,6 +18,11 @@ const userChatSchema = new Schema(
         lastMessage: {
           type: String,
         },
+        unreadCount: {
+          type: Number,
+          default: 0,
+          min: 0,
+        },
         userInfo: {
           name: {
             type: String,

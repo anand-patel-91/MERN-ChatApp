@@ -12,29 +12,46 @@ const Contacts = () => {
 
   useEffect(() => {
     const fetchChats = async () => {
-      const response = await fetch(`${API_URL}/api/userChats/${user._id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      try {
+        const response = await fetch(`${API_URL}/api/userChats/${user._id}`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
 
-      const json = await response.json();
-      if (response.ok) {
-        setContacts(json[0]?.chats);
-      }else{
-        if(json.error === 'Token expired'){
-          logout()
+        const json = await response.json();
+        if (response.ok) {
+          setContacts(json[0]?.chats || []);
+        } else if (response.status === 401) {
+          logout();
         }
+      } catch (error) {
+        console.error("Unable to load chats:", error);
       }
     };
 
     if (user) {
       fetchChats();
+      const pollingId = setInterval(fetchChats, 2000);
+      return () => clearInterval(pollingId);
     }
   }, [user, logout]);
 
-  const handleSelect = (chat) => {
+  const handleSelect = async (chat, chatId) => {
     dispatch({ type: "CHANGE_USER", payload:{name:chat.name, _id:chat.Id} });
+
+    setContacts((currentContacts) =>
+      currentContacts?.map((contact) =>
+        contact.chatId === chatId ? { ...contact, unreadCount: 0 } : contact
+      )
+    );
+
+    await fetch(`${API_URL}/api/userChats/${chatId}/read`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
   };
 
   return (
@@ -44,7 +61,7 @@ const Contacts = () => {
           <div
             className="userChat"
             key={contact.chatId}
-            onClick={() => handleSelect(contact.userInfo)}
+            onClick={() => handleSelect(contact.userInfo, contact.chatId)}
           >
             {contact.userInfo.profilePic && (
               <img src={contact.userInfo.profilePic} alt="" />
@@ -53,6 +70,11 @@ const Contacts = () => {
               <span>{contact.userInfo.name}</span>
               <p>{contact.lastMessage}</p>
             </div>
+            {contact.unreadCount > 0 && (
+              <span className="unread-count">
+                {contact.unreadCount > 99 ? "99+" : contact.unreadCount}
+              </span>
+            )}
           </div>
         ))}
     </div>

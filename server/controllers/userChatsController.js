@@ -20,6 +20,24 @@ const getUserChats = async (req, res) => {
   res.status(200).json(messages);
 };
 
+const markChatRead = async (req, res) => {
+  const { chatId } = req.params;
+
+  if (!isChatParticipant(chatId, req.user._id)) {
+    return res.status(403).json({ error: "You cannot access this chat" });
+  }
+
+  try {
+    await UserChat.updateOne(
+      { Id: req.user._id, "chats.chatId": chatId },
+      { $set: { "chats.$.unreadCount": 0 } }
+    );
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(400).json({ error: "Unable to mark chat as read" });
+  }
+};
+
 const setUserChats = async (req, res) => {
   const { Id, chatId, content, user } = req.body;
 
@@ -49,6 +67,7 @@ const setUserChats = async (req, res) => {
     } 
 
     let chat = await UserChat.findOne({ Id });
+  const isRecipient = Id !== req.user._id.toString();
 
     if (!chat) {
       chat = new UserChat({
@@ -57,6 +76,7 @@ const setUserChats = async (req, res) => {
           {
             chatId,
             lastMessage: content.trim(),
+            unreadCount: isRecipient ? 1 : 0,
             userInfo: { Id: user._id, name: chatUser.name, profilePic: chatUser.profilePic },
           },
         ],
@@ -66,10 +86,14 @@ const setUserChats = async (req, res) => {
       const existingChat = chat.chats.find((c) => c.chatId === chatId);
       if (existingChat) {
         existingChat.lastMessage = content.trim();
+        if (isRecipient) {
+          existingChat.unreadCount = (existingChat.unreadCount || 0) + 1;
+        }
       } else {
         chat.chats.push({
           chatId,
           lastMessage: content.trim(),
+          unreadCount: isRecipient ? 1 : 0,
           userInfo: { Id: user._id, name: chatUser.name, profilePic: chatUser.profilePic },
         });
       }
@@ -82,4 +106,4 @@ const setUserChats = async (req, res) => {
   }
 };
 
-module.exports = { getUserChats, setUserChats };
+module.exports = { getUserChats, setUserChats, markChatRead };

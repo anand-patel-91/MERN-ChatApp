@@ -14,7 +14,7 @@ export const messagesReducer = (state, action) => {
       };
     case "LOGOUT":
       return {
-        message: [],
+        messages: null,
       };
     default:
       return state;
