@@ -1,4 +1,5 @@
 const UserChat = require("../models/userChatModel");
+const User = require("../models/userModel");
 
 const isChatParticipant = (chatId, userId) => {
   if (typeof chatId !== "string" || !/^[a-f\d]{48}$/i.test(chatId)) {
@@ -42,6 +43,11 @@ const setUserChats = async (req, res) => {
   }
 
   try {
+    const chatUser = await User.findById(user._id).select("name profilePic").lean();
+    if (!chatUser) {
+      return res.status(400).json({ error: "Chat user not found" });
+    } 
+
     let chat = await UserChat.findOne({ Id });
 
     if (!chat) {
@@ -51,7 +57,7 @@ const setUserChats = async (req, res) => {
           {
             chatId,
             lastMessage: content.trim(),
-            userInfo: { Id: user._id, name: user.name },
+            userInfo: { Id: user._id, name: chatUser.name, profilePic: chatUser.profilePic },
           },
         ],
       });
@@ -64,7 +70,7 @@ const setUserChats = async (req, res) => {
         chat.chats.push({
           chatId,
           lastMessage: content.trim(),
-          userInfo: { Id: user._id, name: user.name },
+          userInfo: { Id: user._id, name: chatUser.name, profilePic: chatUser.profilePic },
         });
       }
       await chat.save();

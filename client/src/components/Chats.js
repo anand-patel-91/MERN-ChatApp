@@ -46,6 +46,9 @@ const Contacts = () => {
             key={contact.chatId}
             onClick={() => handleSelect(contact.userInfo)}
           >
+            {contact.userInfo.profilePic && (
+              <img src={contact.userInfo.profilePic} alt="" />
+            )}
             <div className="userChatInfo">
               <span>{contact.userInfo.name}</span>
               <p>{contact.lastMessage}</p>

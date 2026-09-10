@@ -13,23 +13,48 @@ const loginUser = async (req, res) => {
 
     const token = createToken(user._id);
 
-    res.status(200).json({ email: user.email, name: user.name, token, _id: user._id });
+    res.status(200).json({ email: user.email, name: user.name, profilePic: user.profilePic, token, _id: user._id });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
 const signupUser = async (req, res) => {
-  const { email, name, password } = req.body;
+  const { email, name, password, profilePic } = req.body;
 
   try {
-    const user = await User.signup(email, name, password);
+    const user = await User.signup(email, name, password, profilePic);
 
     const token = createToken(user._id);
 
-    res.status(200).json({ email: user.email, name: user.name, token, _id: user._id });
+    res.status(200).json({ email: user.email, name: user.name, profilePic: user.profilePic, token, _id: user._id });
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+const updateProfilePicture = async (req, res) => {
+  const { profilePic } = req.body;
+  const profilePicPattern = /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$/;
+
+  if (
+    typeof profilePic !== "string" ||
+    profilePic.length > 3000000 ||
+    !profilePicPattern.test(profilePic)
+  ) {
+    return res.status(400).json({ error: "Use a valid image under 2 MB" });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { profilePic },
+      { new: true, runValidators: true }
+    ).select("_id email name profilePic");
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(400).json({ error: "Unable to update profile picture" });
   }
 };
 
@@ -45,7 +70,7 @@ const searchUser = async (req, res) => {
   try {
     const users = await User.find(
       { name: { $regex: escapedName, $options: "i" } },
-      { name: 1 }
+      { name: 1, profilePic: 1 }
     ).limit(20).lean();
 
     if (users.length > 0) {
@@ -58,4 +83,4 @@ const searchUser = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, loginUser, searchUser };
+module.exports = { signupUser, loginUser, searchUser, updateProfilePicture };

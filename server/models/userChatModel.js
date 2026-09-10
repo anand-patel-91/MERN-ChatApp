@@ -23,6 +23,11 @@ const userChatSchema = new Schema(
             type: String,
             required: true,
           },
+          profilePic: {
+            type: String,
+            default: "",
+            maxlength: 3000000,
+          },
           Id: {
             type: Schema.Types.ObjectId ,
             required: true,

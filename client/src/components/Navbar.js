@@ -17,6 +17,11 @@ const Navbar = () => {
         <span className="nav-logo">iChat</span>
       </Link>
       <div className="nav-user">
+        {user?.profilePic && (
+          <div className="profile-avatar">
+            <img src={user.profilePic} alt="Profile" />
+          </div>
+        )}
         <span>{user && user.name}</span>
         <button className="logout" onClick={handleClick}>
           Log Out

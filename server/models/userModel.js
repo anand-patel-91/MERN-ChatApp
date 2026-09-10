@@ -18,13 +18,18 @@ const userSchema = new Schema({
     trim: true,
     maxlength: 50,
   },
+  profilePic: {
+    type: String,
+    default: "",
+    maxlength: 3000000,
+  },
   password: {
     type: String,
     required: true,
   },
 });
 
-userSchema.statics.signup = async function (email, name, password) {
+userSchema.statics.signup = async function (email, name, password, profilePic = "") {
   email = typeof email === "string" ? email.trim().toLowerCase() : email;
   name = typeof name === "string" ? name.trim() : name;
 
@@ -40,6 +45,14 @@ userSchema.statics.signup = async function (email, name, password) {
     throw Error("Password not strong enough");
   }
 
+  if (
+    profilePic &&
+    (profilePic.length > 3000000 ||
+      !/^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$/.test(profilePic))
+  ) {
+    throw Error("Use a valid image under 2 MB");
+  }
+
   const exists = await this.findOne({ email });
 
   if (exists) {
@@ -50,7 +63,7 @@ userSchema.statics.signup = async function (email, name, password) {
 
   const hash = await bcrypt.hash(password, salt);
 
-  const user = await this.create({ email, name, password: hash });
+  const user = await this.create({ email, name, password: hash, profilePic });
 
   return user;
 };

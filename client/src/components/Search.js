@@ -14,7 +14,7 @@ const Search = () => {
   const handleSelect = (chat) => {
     dispatch({
       type: "CHANGE_USER",
-      payload: { _id: chat._id, name: chat.name },
+      payload: { _id: chat._id, name: chat.name, profilePic: chat.profilePic },
     });
   };
 
@@ -60,6 +60,7 @@ const Search = () => {
             onClick={() => handleSelect(chat)}
             key={chat._id}
           >
+            {chat.profilePic && <img src={chat.profilePic} alt="" />}
             <div className="userChatInfo">
               <span>{chat.name}</span>
             </div>

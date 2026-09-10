@@ -13,7 +13,7 @@ if (!process.env.JWT_SECRET || !process.env.MONGODB_URI) {
   throw new Error("JWT_SECRET and MONGODB_URI must be set in server/.env");
 }
 
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json({ limit: "3mb" }));
 app.use(cors());
 
 app.use("/api/messages", messageRoutes);
