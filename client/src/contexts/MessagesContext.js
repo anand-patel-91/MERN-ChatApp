@@ -15,11 +15,26 @@ export const messagesReducer = (state, action) => {
     case "APPEND_MESSAGES":
       return {
         messages: [
-          ...state.messages,
+          ...state.messages.map(
+            (message) =>
+              action.payload.find((item) => item._id === message._id) || message
+          ),
           ...action.payload.filter(
             (message) => !state.messages.some((item) => item._id === message._id)
           ),
         ],
+      };
+    case "UPDATE_MESSAGE":
+      return {
+        messages: state.messages.map((message) =>
+          message._id === action.payload._id ? action.payload : message
+        ),
+      };
+    case "DELETE_MESSAGE":
+      return {
+        messages: state.messages.filter(
+          (message) => message._id !== action.payload
+        ),
       };
     case "LOGOUT":
       return {

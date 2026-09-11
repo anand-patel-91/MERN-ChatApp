@@ -94,4 +94,72 @@ const createMessage = async (req, res) => {
   }
 };
 
-module.exports = { createMessage, getMessages };
+const updateMessage = async (req, res) => {
+  const { chatId, content } = req.body;
+  const { messageId } = req.params;
+
+  if (
+    !isChatParticipant(chatId, req.user._id) ||
+    typeof content !== "string" ||
+    !content.trim() ||
+    content.length > 2000
+  ) {
+    return res.status(400).json({ error: "Invalid message update" });
+  }
+
+  try {
+    const chat = await Message.findOneAndUpdate(
+      {
+        chatId,
+        messages: { $elemMatch: { _id: messageId, senderId: req.user._id } },
+      },
+      {
+        $set: {
+          "messages.$.content": content.trim(),
+        },
+      },
+      { new: true }
+    ).lean();
+
+    if (!chat) {
+      return res.status(404).json({ error: "Message not found" });
+    }
+
+    return res.status(200).json(
+      chat.messages.find((message) => message._id.toString() === messageId)
+    );
+  } catch (error) {
+    return res.status(400).json({ error: "Unable to edit message" });
+  }
+};
+
+const deleteMessage = async (req, res) => {
+  const { chatId } = req.body;
+  const { messageId } = req.params;
+
+  if (!isChatParticipant(chatId, req.user._id)) {
+    return res.status(403).json({ error: "You cannot access this chat" });
+  }
+
+  try {
+    const result = await Message.updateOne(
+      { chatId },
+      { $pull: { messages: { _id: messageId, senderId: req.user._id } } }
+    );
+
+    if (!result.modifiedCount) {
+      return res.status(404).json({ error: "Message not found" });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(400).json({ error: "Unable to delete message" });
+  }
+};
+
+module.exports = {
+  createMessage,
+  getMessages,
+  updateMessage,
+  deleteMessage,
+};

@@ -689,6 +689,7 @@ input {
 }
 
 .message {
+  position: relative;
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -1326,6 +1327,104 @@ input {
   cursor: pointer;
   font-size: 34px;
   line-height: 1;
+}
+
+.message-menu-wrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.message-menu-trigger {
+  display: flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 160ms ease, background 160ms ease;
+}
+
+.message:hover .message-menu-trigger,
+.message:focus-within .message-menu-trigger,
+.message-menu-trigger[aria-expanded="true"] {
+  opacity: 1;
+}
+
+.message-menu-trigger:hover,
+.message-menu-trigger[aria-expanded="true"] {
+  border-color: var(--line);
+  background: var(--surface-soft);
+}
+
+.message-menu-trigger span {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.message-menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  display: flex;
+  min-width: 100px;
+  flex-direction: column;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.message-menu button,
+.message-edit-form button {
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface-soft);
+  color: var(--navy);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.message-menu button:hover,
+.message-edit-form button:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.message-edit-form textarea {
+  display: block;
+  width: min(360px, 100%);
+  min-height: 60px;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  resize: vertical;
+}
+
+.message-edit-form > div {
+  display: flex;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.message-error {
+  display: block;
+  margin-top: 6px;
+  color: #b53e36;
+  font-size: 11px;
 }
 
 .error {
