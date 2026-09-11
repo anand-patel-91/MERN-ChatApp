@@ -4,6 +4,7 @@ import { useMessagesContext } from "../hooks/useMessagesContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useChatContext } from "../hooks/useChatContext";
 import { API_URL } from "../config";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Messages = () => {
   const { messages, dispatch } = useMessagesContext();
@@ -11,6 +12,8 @@ const Messages = () => {
   const { chatId } = useChatContext();
   const lastMessageTimestamp = useRef(null);
   const hasLoadedMessages = useRef(false);
+  const [loading, setLoading] = React.useState(false);
+  const [loadError, setLoadError] = React.useState("");
 
   useEffect(() => {
     if (!user || !chatId) {
@@ -19,6 +22,8 @@ const Messages = () => {
 
     lastMessageTimestamp.current = null;
     hasLoadedMessages.current = false;
+    setLoading(true);
+    setLoadError("");
     let cancelled = false;
 
     const fetchMessages = async () => {
@@ -31,9 +36,10 @@ const Messages = () => {
             Authorization: `Bearer ${user.token}`,
           },
         });
-        const json = await response.json();
+        const json = await response.json().catch(() => ({}));
 
         if (!cancelled && response.ok) {
+          setLoading(false);
           if (!hasLoadedMessages.current) {
             hasLoadedMessages.current = true;
             if (json.length) {
@@ -58,9 +64,14 @@ const Messages = () => {
               },
             });
           }
+        } else if (!cancelled) {
+          setLoading(false);
+          setLoadError(json.error || "Unable to load messages");
         }
       } catch (error) {
         if (!cancelled) {
+          setLoading(false);
+          setLoadError("Unable to connect to the server");
           console.error("Unable to load messages:", error);
         }
       }
@@ -77,10 +88,15 @@ const Messages = () => {
 
   return (
     <div className="messages">
-      {messages &&
+      {loading ? (
+        <LoadingSpinner label="Loading messages" />
+      ) : loadError ? (
+        <p className="inline-error">{loadError}</p>
+      ) : messages ? (
         messages.map((message) => (
           <Message message={message} key={message._id} />
-        ))}
+        ))
+      ) : null}
     </div>
   );
 };

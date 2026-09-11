@@ -4,9 +4,12 @@ import { useChatContext } from "../hooks/useChatContext";
 import { useLogout } from "../hooks/useLogout";
 import { API_URL } from "../config";
 import ImageModal from "./ImageModal";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Contacts = () => {
   const [contacts, setContacts] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const contactsFingerprint = useRef("");
   const { user } = useAuthContext();
@@ -22,8 +25,10 @@ const Contacts = () => {
           },
         });
 
-        const json = await response.json();
+        const json = await response.json().catch(() => ({}));
         if (response.ok) {
+          setLoading(false);
+          setLoadError("");
           const nextContacts = (json[0]?.chats || []).sort(
             (firstChat, secondChat) =>
               new Date(secondChat.lastMessageAt || 0) -
@@ -54,8 +59,13 @@ const Contacts = () => {
           }
         } else if (response.status === 401) {
           logout();
+        } else {
+          setLoading(false);
+          setLoadError(json.error || "Unable to load chats");
         }
       } catch (error) {
+        setLoading(false);
+        setLoadError("Unable to connect to the server");
         console.error("Unable to load chats:", error);
       }
     };
@@ -109,6 +119,8 @@ const Contacts = () => {
 
   return (
     <div className="chats">
+      {loading && <LoadingSpinner label="Loading chats" />}
+      {!loading && loadError && <p className="inline-error">{loadError}</p>}
       {contacts &&
         contacts.map((contact) => (
           <div

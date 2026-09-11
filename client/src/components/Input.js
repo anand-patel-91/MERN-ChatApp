@@ -52,36 +52,31 @@ const Input = () => {
   };
 
   const saveToUserChats = async (text) => {
-    await fetch(`${API_URL}/api/userChats`, {
-      method: "POST",
-      body: JSON.stringify({
-        chatId,
-        content: text,
-        Id: user._id,
-        user:chat
-      }),
-      headers: {
+    try {
+      const headers = {
         "Content-type": "application/json",
         Authorization: `Bearer ${user.token}`,
-      },
-    });
-    
-    await fetch(`${API_URL}/api/userChats`, {
-      method: "POST",
-      body: JSON.stringify({
-        chatId,
-        content: text,
-        Id: chat._id,
-        user: {
-          name: user.name,
-          _id: user._id,
-        },
-      }),
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
+      };
+      await Promise.all([
+        fetch(`${API_URL}/api/userChats`, {
+          method: "POST",
+          body: JSON.stringify({ chatId, content: text, Id: user._id, user: chat }),
+          headers,
+        }),
+        fetch(`${API_URL}/api/userChats`, {
+          method: "POST",
+          body: JSON.stringify({
+            chatId,
+            content: text,
+            Id: chat._id,
+            user: { name: user.name, _id: user._id },
+          }),
+          headers,
+        }),
+      ]);
+    } catch (error) {
+      setAttachmentError("Message sent, but chat list could not be updated");
+    }
   };
 
   const handleClick = async () => {

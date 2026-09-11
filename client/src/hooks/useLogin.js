@@ -11,24 +11,26 @@ export const useLogin = () => {
     setLoading(true);
     setError(null);
 
-    const response = await fetch(`${API_URL}/api/user/login`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch(`${API_URL}/api/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const json = await response.json().catch(() => ({}));
 
-    const json = await response.json();
+      if (!response.ok) {
+        setError(json.error || "Unable to log in");
+        return;
+      }
 
-    if (!response.ok) {
-      setLoading(false);
-      setError(json.error);
-    }
-    if (response.ok) {
       localStorage.setItem("user", JSON.stringify(json));
-
       dispatch({ type: "LOGIN", payload: json });
+    } catch (requestError) {
+      setError("Unable to connect to the server. Check your connection and try again.");
+    } finally {
       setLoading(false);
     }
   };

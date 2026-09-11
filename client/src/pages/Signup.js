@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSignup } from "../hooks/useSignup";
 import { compressImage } from "../utils/compressImage";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -86,7 +87,9 @@ const Signup = () => {
             onChange={(e) => setPassword(e.target.value.trimStart())}
           />
 
-          <button disabled={loading}>Sign up</button>
+          <button disabled={loading}>
+            {loading ? <LoadingSpinner label="Creating account" /> : "Sign up"}
+          </button>
           {error && <p className="error">{error}</p>}
         </form>
 

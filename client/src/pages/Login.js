@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -40,7 +41,9 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value.trimStart())}
           />
 
-          <button disabled={loading}>Log in</button>
+          <button disabled={loading}>
+            {loading ? <LoadingSpinner label="Logging in" /> : "Log in"}
+          </button>
           {error && <p className="error">{error}</p>}
         </form>
 

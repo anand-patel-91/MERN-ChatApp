@@ -44,22 +44,25 @@ const Search = () => {
 
   const handleSearch = async () => {
     setErr(null);
-    const response = await fetch(`${API_URL}/api/user/search`, {
-      method: "POST",
-      body: JSON.stringify({ name }),
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
+    try {
+      const response = await fetch(`${API_URL}/api/user/search`, {
+        method: "POST",
+        body: JSON.stringify({ name }),
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      const json = await response.json().catch(() => ({}));
 
-    const json = await response.json();
-
-    if (response.ok) {
-      setName("");
-      setChats(json);
-    } else {
-      setErr({ message: "No such user found" });
+      if (response.ok) {
+        setName("");
+        setChats(json);
+      } else {
+        setErr({ message: json.error || "No such user found" });
+      }
+    } catch (error) {
+      setErr({ message: "Unable to connect to the server" });
     }
   };
 
