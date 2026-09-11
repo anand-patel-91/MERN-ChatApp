@@ -10,6 +10,7 @@ const {
   updateProfile,
   getUserProfile,
   getProfilePicture,
+  deleteAccount,
 } = require("../controllers/userController");
 const requireAuth = require("../middleware/requireAuth");
 
@@ -29,5 +30,7 @@ router.get("/profile/:_id", getUserProfile);
 router.patch("/profile-picture", updateProfilePicture);
 
 router.patch("/profile", updateProfile);
+
+router.delete("/account", deleteAccount);
 
 module.exports = router;

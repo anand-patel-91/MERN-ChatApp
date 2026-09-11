@@ -94,6 +94,42 @@ const Settings = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Delete your account permanently? This will delete your profile, all chats, messages, and profile picture. This cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/user/account`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      const json = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(json.error || "Unable to delete account");
+        setLoading(false);
+        return;
+      }
+
+      localStorage.removeItem("user");
+      dispatch({ type: "LOGOUT" });
+      chatDispatch({ type: "LOGOUT" });
+      messagesDispatch({ type: "LOGOUT" });
+      navigate("/login", { replace: true });
+    } catch (requestError) {
+      setError("Unable to connect to the server");
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="settings-page">
       <section className="settings-card">
@@ -160,6 +196,21 @@ const Settings = () => {
             {loading ? "Saving..." : "Save changes"}
           </button>
         </form>
+
+        <section className="danger-zone">
+          <div>
+            <h2>Delete account</h2>
+            <p>This permanently deletes your profile, chats, messages, and profile picture.</p>
+          </div>
+          <button
+            className="delete-account-button"
+            type="button"
+            disabled={loading}
+            onClick={handleDeleteAccount}
+          >
+            Delete account
+          </button>
+        </section>
       </section>
       {showImage && (
         <ImageModal

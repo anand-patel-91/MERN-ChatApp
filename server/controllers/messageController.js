@@ -199,9 +199,14 @@ const deleteMessage = async (req, res) => {
   }
 };
 
+const deleteMessagesForUser = async (userId) => {
+  await Message.deleteMany({ chatId: { $regex: userId } });
+};
+
 module.exports = {
   createMessage,
   getMessages,
   updateMessage,
   deleteMessage,
+  deleteMessagesForUser,
 };

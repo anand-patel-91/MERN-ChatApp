@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const UserChat = require("../models/userChatModel");
+const { deleteMessagesForUser } = require("./messageController");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
@@ -217,6 +218,29 @@ const getProfilePicture = async (req, res) => {
   }
 };
 
+const deleteAccount = async (req, res) => {
+  const userId = req.user._id;
+  const userIdString = userId.toString();
+
+  try {
+    await UserChat.deleteOne({ Id: userId });
+    await UserChat.updateMany(
+      {},
+      { $pull: { chats: { "userInfo.Id": userId } } }
+    );
+    await deleteMessagesForUser(userIdString);
+
+    const result = await User.deleteOne({ _id: userId });
+    if (!result.deletedCount) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).json({ error: "Unable to delete account" });
+  }
+};
+
 module.exports = {
   signupUser,
   loginUser,
@@ -225,4 +249,5 @@ module.exports = {
   updateProfile,
   getUserProfile,
   getProfilePicture,
+  deleteAccount,
 };
