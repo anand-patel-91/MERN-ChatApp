@@ -24,6 +24,12 @@ export const messagesReducer = (state, action) => {
           ),
         ],
       };
+    case "REMOVE_MESSAGES":
+      return {
+        messages: state.messages.filter(
+          (message) => !action.payload.includes(message._id)
+        ),
+      };
     case "UPDATE_MESSAGE":
       return {
         messages: state.messages.map((message) =>

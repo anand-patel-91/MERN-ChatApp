@@ -12,6 +12,7 @@ const Messages = () => {
   const { chatId } = useChatContext();
   const lastMessageTimestamp = useRef(null);
   const hasLoadedMessages = useRef(false);
+  const knownMessageIds = useRef(new Set());
   const [loading, setLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState("");
 
@@ -22,6 +23,7 @@ const Messages = () => {
 
     lastMessageTimestamp.current = null;
     hasLoadedMessages.current = false;
+    knownMessageIds.current = new Set();
     setLoading(true);
     setLoadError("");
     let cancelled = false;
@@ -31,11 +33,15 @@ const Messages = () => {
         const since = lastMessageTimestamp.current
           ? `?since=${encodeURIComponent(lastMessageTimestamp.current)}`
           : "";
-        const response = await fetch(`${API_URL}/api/messages/${chatId}${since}`, {
+        const sync = hasLoadedMessages.current ? "&sync=1" : "";
+        const response = await fetch(
+          `${API_URL}/api/messages/${chatId}${since}${since ? sync : ""}`,
+          {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
-        });
+          }
+        );
         const json = await response.json().catch(() => ({}));
 
         if (!cancelled && response.ok) {
@@ -43,6 +49,7 @@ const Messages = () => {
           if (!hasLoadedMessages.current) {
             hasLoadedMessages.current = true;
             if (json.length) {
+              knownMessageIds.current = new Set(json.map((message) => message._id));
               lastMessageTimestamp.current = json[json.length - 1].timestamp;
             }
             dispatch({ type: "SET_MESSAGES", payload: json });
@@ -53,16 +60,29 @@ const Messages = () => {
                 Authorization: `Bearer ${user.token}`,
               },
             });
-          } else if (json.length) {
-            lastMessageTimestamp.current = json[json.length - 1].timestamp;
-            dispatch({ type: "APPEND_MESSAGES", payload: json });
+          } else {
+            const currentIds = new Set(json.currentIds || []);
+            const deletedIds = [...knownMessageIds.current].filter(
+              (messageId) => !currentIds.has(messageId)
+            );
 
-            await fetch(`${API_URL}/api/userChats/${chatId}/read`, {
-              method: "PATCH",
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            });
+            if (deletedIds.length) {
+              deletedIds.forEach((messageId) => knownMessageIds.current.delete(messageId));
+              dispatch({ type: "REMOVE_MESSAGES", payload: deletedIds });
+            }
+
+            if (json.messages?.length) {
+              json.messages.forEach((message) => knownMessageIds.current.add(message._id));
+              lastMessageTimestamp.current = json.messages[json.messages.length - 1].timestamp;
+              dispatch({ type: "APPEND_MESSAGES", payload: json.messages });
+
+              await fetch(`${API_URL}/api/userChats/${chatId}/read`, {
+                method: "PATCH",
+                headers: {
+                  Authorization: `Bearer ${user.token}`,
+                },
+              });
+            }
           }
         } else if (!cancelled) {
           setLoading(false);

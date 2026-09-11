@@ -1,4 +1,5 @@
 const Message = require("../models/messageModel");
+const UserChat = require("../models/userChatModel");
 
 const allowedAttachmentTypes = new Set([
   "image/jpeg",
@@ -48,9 +49,32 @@ const getMessages = async (req, res) => {
     return res.status(403).json({ error: "You cannot access this chat" });
   }
 
-  const chat = await Message.findOne({ chatId }).lean();
+  const isSyncRequest = req.query.sync === "1" && req.query.since;
+  const chat = isSyncRequest
+    ? await Message.findOne({ chatId })
+        .select({ "messages._id": 1, "messages.timestamp": 1 })
+        .lean()
+    : await Message.findOne({ chatId }).lean();
+
   if (chat) {
     const since = req.query.since ? new Date(req.query.since) : null;
+    if (isSyncRequest && since && !Number.isNaN(since.getTime())) {
+      const currentIds = chat.messages.map((message) => message._id.toString());
+      const hasNewMessages = chat.messages.some(
+        (message) => new Date(message.timestamp) > since
+      );
+
+      if (!hasNewMessages) {
+        return res.status(200).json({ messages: [], currentIds });
+      }
+
+      const fullChat = await Message.findOne({ chatId }).select("messages").lean();
+      const messages = fullChat.messages.filter(
+        (message) => new Date(message.timestamp) > since
+      );
+      return res.status(200).json({ messages, currentIds });
+    }
+
     const messages = since && !Number.isNaN(since.getTime())
       ? chat.messages.filter((message) => new Date(message.timestamp) > since)
       : chat.messages;
@@ -150,6 +174,24 @@ const deleteMessage = async (req, res) => {
     if (!result.modifiedCount) {
       return res.status(404).json({ error: "Message not found" });
     }
+
+    const updatedChat = await Message.findOne({ chatId }).select("messages").lean();
+    const latestMessage = updatedChat?.messages?.[updatedChat.messages.length - 1];
+    const latestPreview = latestMessage
+      ? latestMessage.content || `Attachment: ${latestMessage.attachment?.name || "file"}`
+      : "No messages yet";
+    const latestTimestamp = latestMessage?.timestamp || null;
+    const participantIds = [chatId.slice(0, 24), chatId.slice(24)];
+
+    await UserChat.updateMany(
+      { Id: { $in: participantIds }, "chats.chatId": chatId },
+      {
+        $set: {
+          "chats.$.lastMessage": latestPreview,
+          "chats.$.lastMessageAt": latestTimestamp,
+        },
+      }
+    );
 
     return res.status(204).send();
   } catch (error) {

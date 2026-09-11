@@ -129,20 +129,6 @@ const Message = ({ message }) => {
         </div>
       )}
       <div className="messageContent">
-        {editing ? (
-          <div className="message-edit-form">
-            <textarea
-              value={editText}
-              onChange={(event) => setEditText(event.target.value)}
-              maxLength="2000"
-              autoFocus
-            />
-            <div>
-              <button type="button" onClick={handleEdit}>Save</button>
-              <button type="button" onClick={() => setEditing(false)}>Cancel</button>
-            </div>
-          </div>
-        ) : content ? <p>{content}</p> : null}
         {attachment && (
           attachment.type.startsWith("image/") ? (
             <button
@@ -167,6 +153,20 @@ const Message = ({ message }) => {
             </a>
           )
         )}
+        {editing ? (
+          <div className="message-edit-form">
+            <textarea
+              value={editText}
+              onChange={(event) => setEditText(event.target.value)}
+              maxLength="2000"
+              autoFocus
+            />
+            <div>
+              <button type="button" onClick={handleEdit}>Save</button>
+              <button type="button" onClick={() => setEditing(false)}>Cancel</button>
+            </div>
+          </div>
+        ) : content ? <p className="message-text">{content}</p> : null}
         <span className="messageInfo">
           {formatDistanceToNow(new Date(message.timestamp), {
             addSuffix: true,
